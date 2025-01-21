@@ -1,0 +1,11 @@
+[package]
+name = "tta-cli"
+version = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+clap = { workspace = true }
+tta = { workspace = true }
+
+[lints]
+workspace = true

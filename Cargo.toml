@@ -1,12 +1,14 @@
 [workspace]
 resolver = "2"
-members = ["tta"]
+members = ["tta", "tta-cli"]
 
 [workspace.package]
 version = "0.0.0"
 edition = "2021"
 
 [workspace.dependencies]
+clap = { version = "4.5.27", features = ["derive", "deprecated"] }
+tta = { path = "tta" }
 
 [workspace.lints]
 rust.unsafe_code = { level = "forbid", priority = 1 }
