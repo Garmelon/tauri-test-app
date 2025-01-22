@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+pushd tta-app
+pnpm install --frozen-lockfile
+pnpm tauri android build --apk
+popd
+
+mkdir -p target/release/
+mv tta-app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk target/release/tta-app.apk
+
+echo "tta-app.apk can be found at target/release/tta-app.apk"
