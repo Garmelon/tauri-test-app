@@ -1,0 +1,56 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  main:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      # https://doc.rust-lang.org/cargo/guide/continuous-integration.html#github-actions
+      - name: Set up rust
+        run: |
+          rustup update stable
+          rustup default stable
+
+      # - name: Set up node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     cache: pnpm
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # https://github.com/tauri-apps/tauri-action?tab=readme-ov-file#usage
+      # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/customizing-github-hosted-runners#installing-software-on-ubuntu-runners
+      - name: Install tauri dependencies (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt update
+          sudo apt install libwebkit2gtk-4.1-dev
+
+      - name: Build
+        run: ./build
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.os }}
+          path: |
+            target/release/tta-cli
+            target/release/tta-cli.exe
+            target/release/tta-app
+            target/release/tta-app.exe

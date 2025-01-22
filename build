@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+pushd tta-cli
+cargo build --release
+popd
+
+pushd tta-app
+pnpm install --frozen-lockfile
+pnpm tauri build
+popd
+
+echo "tta-cli can be found at target/release/tta-cli"
+echo "tta-app can be found at target/release/tta-app"
