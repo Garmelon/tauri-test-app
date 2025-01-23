@@ -63,29 +63,37 @@ jobs:
             target/release/tta-cli.exe
             target/release/tta-app.exe
 
-  # TODO: https://v2.tauri.app/distribute/sign/android/
-  # build-android:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check out repo
-  #       uses: actions/checkout@v4
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
 
-  #     - name: Set up pnpm
-  #       uses: pnpm/action-setup@v4
-  #       with:
-  #         version: 10
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-  #     # https://v2.tauri.app/start/prerequisites/#android
-  #     - name: Set up rust
-  #       run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+      # https://v2.tauri.app/start/prerequisites/#android
+      - name: Set up Rust
+        run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 
-  #     - name: Build
-  #       run: |
-  #         export NDK_HOME="$ANDROID_NDK_HOME"
-  #         ./build_android
+      # https://v2.tauri.app/distribute/sign/android/
+      - name: Set up Android signing
+        run: |
+          cd tta-app/src-tauri/gen/android
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" > key.properties
+          echo "password=${{ secrets.ANDROID_KEY_PASSWORD }}" >> key.properties
+          base64 -d <<< "${{ secrets.ANDROID_KEY_BASE64 }}" > $RUNNER_TEMP/keystore.jks
+          echo "storeFile=$RUNNER_TEMP/keystore.jks" >> key.properties
 
-  #     - name: Upload
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: tta-android
-  #         path: target/release/tta-app.apk
+      - name: Build
+        run: |
+          export NDK_HOME="$ANDROID_NDK_HOME"
+          ./build_android
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: tta-android
+          path: target/release/tta-app.apk
