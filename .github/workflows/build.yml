@@ -97,3 +97,34 @@ jobs:
         with:
           name: tta-android
           path: target/release/tta-app.apk
+
+  release:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    needs:
+      - build-linux
+      - build-windows
+      - build-android
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: List artifacts
+        run: ls -l
+
+      - name: Zip artifacts
+        run: |
+          zip -r tta-linux.zip tta-linux
+          zip -r tta-windows.zip tta-windows
+          mv tta-android tta-app.apk
+
+      - name: List artifacts again
+        run: ls -l
+
+      - name: Create new release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: tta-linux.zip,tta-windows.zip,tta-app.apk
+          body: Automated release
