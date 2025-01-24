@@ -118,13 +118,16 @@ jobs:
         run: |
           zip -r tta-linux.zip tta-linux
           zip -r tta-windows.zip tta-windows
-          mv tta-android tta-app.apk
+          mv tta-android/tta-app.apk tta-android.apk
 
       - name: List artifacts again
         run: ls -l
 
       - name: Create new release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v2
         with:
-          artifacts: tta-linux.zip,tta-windows.zip,tta-app.apk
           body: Automated release
+          files: |
+            tta-linux.zip
+            tta-windows.zip
+            tta-android.apk
